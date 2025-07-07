@@ -1,0 +1,38 @@
+---
+- name: Download and upload plugins per host
+  hosts: minecraft
+  gather_facts: false
+  vars_files:
+    - plugin_map.yml
+  vars:
+    local_plugin_dir: /tmp/mc_plugin_sync
+
+  tasks:
+
+    - name: Create local plugin cache directory
+      ansible.builtin.file:
+        path: "{{ local_plugin_dir }}"
+        state: directory
+        mode: '0755'
+      delegate_to: localhost
+      run_once: true
+
+    - name: Set plugin list for this host
+      set_fact:
+        my_plugins: "{{ plugin_hosts[inventory_hostname] | default([]) }}"
+
+    - name: Download plugins for this host
+      ansible.builtin.get_url:
+        url: "{{ plugins[item] }}"
+        dest: "{{ local_plugin_dir }}/{{ item }}.jar"
+        mode: '0644'
+      delegate_to: localhost
+      loop: "{{ my_plugins }}"
+
+    - name: Upload plugins to remote host via SFTP
+      community.general.sftp:
+        src: "{{ local_plugin_dir }}/{{ item }}.jar"
+        dest: "{{ plugin_dir }}/{{ item }}.jar"
+        mode: put
+      delegate_to: localhost
+      loop: "{{ my_plugins }}"
