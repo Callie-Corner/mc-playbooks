@@ -1,0 +1,14 @@
+plugins:
+  EssentialsX: "https://example.com/EssentialsX.jar"
+  LuckPerms: "https://example.com/LuckPerms.jar"
+  WorldEdit: "https://example.com/WorldEdit.jar"
+
+plugin_hosts:
+  server1:
+    - EssentialsX
+    - LuckPerms
+  server2:
+    - WorldEdit
+  server3:
+  server4:
+    - LuckPerms
